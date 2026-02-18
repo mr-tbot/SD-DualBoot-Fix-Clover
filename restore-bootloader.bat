@@ -95,6 +95,7 @@ if defined EFI_VOL (
     echo [+] Found EFI partition
 ) else (
     REM Try alternative method using diskpart
+    REM Note: This fallback method may not work reliably on all systems
     echo [*] Trying alternative EFI detection method...
     echo list volume > "%TEMP%\diskpart.txt"
     for /f "tokens=2,3" %%a in ('diskpart /s "%TEMP%\diskpart.txt" ^| findstr /i "FAT.*EFI"') do (

@@ -86,7 +86,7 @@ Backup Date: $(date)
 EFI Partition: $EFI_PARTITION
 Hostname: $(hostname)
 Kernel: $(uname -r)
-OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)
+OS: $(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
 EOF
 
 # Unmount EFI partition
