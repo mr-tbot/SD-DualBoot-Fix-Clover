@@ -21,6 +21,8 @@ if %errorlevel% neq 0 (
 
 REM Configuration
 set "BACKUP_DIR=%USERPROFILE%\.bootloader-backups"
+REM Note: Timestamp format assumes standard Windows date format (locale-dependent)
+REM For systems with different regional settings, adjust the substring indices accordingly
 set "TIMESTAMP=%date:~-4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
 set "TIMESTAMP=%TIMESTAMP: =0%"
 set "BACKUP_PATH=%BACKUP_DIR%\backup_%TIMESTAMP%"
@@ -38,11 +40,20 @@ if defined EFI_VOL (
     echo [+] Found EFI partition
 ) else (
     REM Try alternative method using diskpart
+    echo [*] Trying alternative EFI detection method...
     echo list volume > "%TEMP%\diskpart.txt"
     for /f "tokens=2,3" %%a in ('diskpart /s "%TEMP%\diskpart.txt" ^| findstr /i "FAT.*EFI"') do (
         set "EFI_VOL=\\?\Volume{%%a}\"
     )
     del "%TEMP%\diskpart.txt"
+    if defined EFI_VOL (
+        echo [+] Found EFI partition using alternative method
+    ) else (
+        echo [ERROR] Could not find EFI partition using any method
+        echo Please ensure your system has an accessible EFI partition
+        pause
+        exit /b 1
+    )
 )
 
 echo [*] Mounting EFI partition to %EFI_MOUNT%...

@@ -37,7 +37,6 @@ echo.
 set count=0
 for /f "delims=" %%d in ('dir /b /ad /o-d "%BACKUP_DIR%\backup_*" 2^>nul') do (
     set "backup[!count!]=%%d"
-    set /a count+=1
     if exist "%BACKUP_DIR%\%%d\backup_info.txt" (
         for /f "tokens=1* delims=:" %%a in ('type "%BACKUP_DIR%\%%d\backup_info.txt" ^| findstr "Backup Date"') do (
             echo   [!count!] %%d - %%b
@@ -45,6 +44,7 @@ for /f "delims=" %%d in ('dir /b /ad /o-d "%BACKUP_DIR%\backup_*" 2^>nul') do (
     ) else (
         echo   [!count!] %%d
     )
+    set /a count+=1
 )
 
 if %count%==0 (
@@ -95,11 +95,19 @@ if defined EFI_VOL (
     echo [+] Found EFI partition
 ) else (
     REM Try alternative method using diskpart
+    echo [*] Trying alternative EFI detection method...
     echo list volume > "%TEMP%\diskpart.txt"
     for /f "tokens=2,3" %%a in ('diskpart /s "%TEMP%\diskpart.txt" ^| findstr /i "FAT.*EFI"') do (
         set "EFI_VOL=\\?\Volume{%%a}\"
     )
     del "%TEMP%\diskpart.txt"
+    if defined EFI_VOL (
+        echo [+] Found EFI partition using alternative method
+    ) else (
+        echo [ERROR] Could not find EFI partition using any method
+        pause
+        exit /b 1
+    )
 )
 
 echo [*] Mounting EFI partition to %EFI_MOUNT%...
@@ -114,6 +122,7 @@ echo [+] EFI partition mounted successfully
 echo.
 
 REM Create emergency backup
+REM Note: Timestamp format assumes standard Windows date format (locale-dependent)
 set "EMERGENCY_BACKUP=%BACKUP_DIR%\emergency_before_restore_%date:~-4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%"
 set "EMERGENCY_BACKUP=%EMERGENCY_BACKUP: =0%"
 mkdir "%EMERGENCY_BACKUP%"

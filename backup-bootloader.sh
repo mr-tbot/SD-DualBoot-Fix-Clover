@@ -109,12 +109,12 @@ echo "Cleaning old backups (keeping last 10)..."
 cd "$BACKUP_DIR" || exit 1
 # Use a more robust method to clean old backups - sort by newest first
 count=0
-for dir in $(find . -maxdepth 1 -type d -name "backup_*" -printf "%f\n" | sort -r); do
+while IFS= read -r dir; do
     count=$((count + 1))
     if [ $count -gt 10 ] && [ -d "$dir" ]; then
         rm -rf "$dir"
     fi
-done 2>/dev/null
+done < <(find . -maxdepth 1 -type d -name "backup_*" -printf "%f\n" | sort -r)
 echo -e "${GREEN}✓ Old backups cleaned${NC}"
 
 exit 0
