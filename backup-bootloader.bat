@@ -40,7 +40,7 @@ if defined EFI_VOL (
     REM Try alternative method using diskpart
     echo list volume > "%TEMP%\diskpart.txt"
     for /f "tokens=2,3" %%a in ('diskpart /s "%TEMP%\diskpart.txt" ^| findstr /i "FAT.*EFI"') do (
-        set "EFI_VOLUME=%%a"
+        set "EFI_VOL=\\?\Volume{%%a}\"
     )
     del "%TEMP%\diskpart.txt"
 )

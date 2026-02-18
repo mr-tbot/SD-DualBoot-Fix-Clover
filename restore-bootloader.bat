@@ -93,6 +93,13 @@ for /f "tokens=2 delims=:" %%a in ('mountvol ^| findstr /i "EFI"') do set EFI_VO
 if defined EFI_VOL (
     set "EFI_VOL=\\?\Volume{!EFI_VOL:~1,-1!}\"
     echo [+] Found EFI partition
+) else (
+    REM Try alternative method using diskpart
+    echo list volume > "%TEMP%\diskpart.txt"
+    for /f "tokens=2,3" %%a in ('diskpart /s "%TEMP%\diskpart.txt" ^| findstr /i "FAT.*EFI"') do (
+        set "EFI_VOL=\\?\Volume{%%a}\"
+    )
+    del "%TEMP%\diskpart.txt"
 )
 
 echo [*] Mounting EFI partition to %EFI_MOUNT%...
