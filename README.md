@@ -31,6 +31,7 @@ These scripts provide a simple backup and restore solution that works on **both 
 - Administrator privileges
 - Command Prompt or PowerShell
 - Windows 10 or later
+- **Note**: Windows scripts assume US date/time format. If you use a different regional setting, timestamps may not format correctly, but backups will still function.
 
 ## Installation
 
@@ -108,6 +109,7 @@ The scripts back up the following from your EFI partition:
 - Ensure your system uses UEFI boot mode (not legacy BIOS)
 - Check if your EFI partition is properly formatted (FAT32)
 - Verify the partition has the correct flags set
+- **Windows**: The primary detection method (mountvol) should work on most systems. If you encounter issues, ensure Windows can access the EFI partition.
 
 ### "Permission denied"
 - On Linux: Make sure you run with `sudo`
@@ -142,6 +144,11 @@ This project is provided as-is for the Steam Deck community. Use at your own ris
 ## Disclaimer
 
 ⚠️ **Important:** Always maintain backups of your important data. While these scripts are designed to help recover from bootloader issues, they may not solve all problems. If you're uncomfortable with command-line tools or system administration, consider seeking help from experienced users.
+
+## Known Limitations
+
+- **Windows timestamp format**: The Windows batch scripts use locale-specific date formatting. On systems with non-US regional settings, the backup timestamp format may differ, but functionality is not affected.
+- **EFI partition access**: Requires proper UEFI boot configuration and accessible EFI partition on both operating systems.
 
 ## Credits
 
