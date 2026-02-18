@@ -106,8 +106,15 @@ echo ""
 
 # Clean old backups (keep last 10)
 echo "Cleaning old backups (keeping last 10)..."
-cd "$BACKUP_DIR"
-ls -t | grep "^backup_" | tail -n +11 | xargs -r rm -rf
+cd "$BACKUP_DIR" || exit 1
+# Use a more robust method to clean old backups
+count=0
+for dir in backup_*/; do
+    count=$((count + 1))
+    if [ $count -gt 10 ] && [ -d "$dir" ]; then
+        rm -rf "$dir"
+    fi
+done 2>/dev/null
 echo -e "${GREEN}✓ Old backups cleaned${NC}"
 
 exit 0

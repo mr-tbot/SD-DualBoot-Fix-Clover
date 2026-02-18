@@ -35,7 +35,8 @@ fi
 # List available backups
 echo "Available backups:"
 echo ""
-BACKUPS=($(ls -t "$BACKUP_DIR" | grep "^backup_"))
+# Use mapfile to safely read backups into array
+mapfile -t BACKUPS < <(find "$BACKUP_DIR" -maxdepth 1 -type d -name "backup_*" -printf "%f\n" | sort -r)
 if [ ${#BACKUPS[@]} -eq 0 ]; then
     echo -e "${RED}Error: No backups found${NC}"
     exit 1
